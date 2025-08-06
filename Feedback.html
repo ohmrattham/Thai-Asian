@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>แบบประเมินเกม</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
+  
+  <!-- Firebase SDK (v9 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: #e2e8f0;
+      margin: 0; padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #1e293b;
+    }
+    .container {
+      background: white;
+      padding: 32px 28px;
+      max-width: 480px;
+      width: 90%;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #2563eb;
+    }
+    label {
+      display: block;
+      margin-top: 18px;
+      font-weight: 600;
+      font-size: 16px;
+      color: #334155;
+    }
+    .rating-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+    .rating-group label {
+      font-weight: normal;
+      font-size: 14px;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+      padding: 8px 0;
+      border-radius: 10px;
+      background: #f1f5f9;
+      margin: 0 4px;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    .rating-group input[type="radio"] {
+      display: none;
+    }
+    .rating-group input[type="radio"]:checked + label {
+      background: #2563eb;
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.5);
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
+      font-size: 14px;
+      resize: vertical;
+      font-family: 'Kanit', sans-serif;
+    }
+    button {
+      margin-top: 28px;
+      width: 100%;
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 14px 0;
+      font-weight: 700;
+      font-size: 18px;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(37, 99, 235, 0.6);
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+    .footer {
+      text-align: center;
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>แบบประเมินเกม</h1>
+
+  <form id="feedbackForm">
+    <label>1. คุณพอใจกับความสนุกของเกมแค่ไหน?</label>
+    <div class="rating-group">
+      <input type="radio" id="fun5" name="fun" value="5" required />
+      <label for="fun5">5</label>
+      <input type="radio" id="fun4" name="fun" value="4" />
+      <label for="fun4">4</label>
+      <input type="radio" id="fun3" name="fun" value="3" />
+      <label for="fun3">3</label>
+      <input type="radio" id="fun2" name="fun" value="2" />
+      <label for="fun2">2</label>
+      <input type="radio" id="fun1" name="fun" value="1" />
+      <label for="fun1">1</label>
+    </div>
+
+    <label>2. ความยากของเกมเหมาะสมหรือไม่?</label>
+    <div class="rating-group">
+      <input type="radio" id="difficulty5" name="difficulty" value="5" required />
+      <label for="difficulty5">5</label>
+      <input type="radio" id="difficulty4" name="difficulty" value="4" />
+      <label for="difficulty4">4</label>
+      <input type="radio" id="difficulty3" name="difficulty" value="3" />
+      <label for="difficulty3">3</label>
+      <input type="radio" id="difficulty2" name="difficulty" value="2" />
+      <label for="difficulty2">2</label>
+      <input type="radio" id="difficulty1" name="difficulty" value="1" />
+      <label for="difficulty1">1</label>
+    </div>
+
+    <label>3. คุณชอบกราฟิกและดีไซน์เกมแค่ไหน?</label>
+    <div class="rating-group">
+      <input type="radio" id="design5" name="design" value="5" required />
+      <label for="design5">5</label>
+      <input type="radio" id="design4" name="design" value="4" />
+      <label for="design4">4</label>
+      <input type="radio" id="design3" name="design" value="3" />
+      <label for="design3">3</label>
+      <input type="radio" id="design2" name="design" value="2" />
+      <label for="design2">2</label>
+      <input type="radio" id="design1" name="design" value="1" />
+      <label for="design1">1</label>
+    </div>
+
+    <label>4. คุณคิดว่าเกมให้ความรู้และสาระประโยชน์หรือไม่?</label>
+    <div class="rating-group">
+      <input type="radio" id="knowledge5" name="knowledge" value="5" required />
+      <label for="knowledge5">5</label>
+      <input type="radio" id="knowledge4" name="knowledge" value="4" />
+      <label for="knowledge4">4</label>
+      <input type="radio" id="knowledge3" name="knowledge" value="3" />
+      <label for="knowledge3">3</label>
+      <input type="radio" id="knowledge2" name="knowledge" value="2" />
+      <label for="knowledge2">2</label>
+      <input type="radio" id="knowledge1" name="knowledge" value="1" />
+      <label for="knowledge1">1</label>
+    </div>
+
+    <label>5. ความคิดเห็นเพิ่มเติม (ถ้ามี)</label>
+    <textarea name="comments" placeholder="กรุณาเขียนความคิดเห็น..." rows="4"></textarea>
+
+    <button type="submit">ส่งแบบประเมิน</button>
+  </form>
+  <div class="footer">
+    © 2025 ทีมงานพัฒนาเกมวัฒนธรรม By OHM_Rattham
+</div>
+
+<script>
+  // กำหนด config Firebase ของคุณตรงนี้
+  const firebaseConfig = {
+    apiKey: "AIzaSyDGYCGAtPuhjhkKKMekfI7HhvG30eDQ2qM",
+    authDomain: "feedback-a512f.firebaseapp.com",
+    projectId: "feedback-a512f",
+    storageBucket: "feedback-a512f.firebasestorage.app",
+    messagingSenderId: "493491136093",
+    appId: "1:493491136093:web:5a3d6f594deedfefe90fb4",
+    measurementId: "G-97MSGTXNGB"
+  };
+
+  // เริ่มต้น Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const form = document.getElementById('feedbackForm');
+
+ form.addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+  const data = {};
+  for (const [key, value] of formData.entries()) {
+    data[key] = value;
+  }
+  data.timestamp = new Date();
+
+  try {
+    await db.collection("feedbacks").add(data);
+    alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
+    form.reset();
+    window.location.href = "score.html"; // ✅ เพิ่มบรรทัดนี้เพื่อไปหน้า score.html
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล:", error);
+    alert("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+  }
+});
+
+</script>
+
+</body>
+</html>

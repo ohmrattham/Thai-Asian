@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>เกมหาของในห้องพญากำธร</title>
+  <style>
+    body {
+      margin: 0;
+      background: #121212;
+      font-family: 'Kanit', sans-serif;
+      color: #ffffff;
+      user-select: none;
+    }
+
+    #game-container {
+      position: relative;
+      width: 768px;
+      max-width: 95vw;
+      height: 1152px;
+      background-image: url('D3.png');
+      background-size: cover;
+      background-position: center;
+      margin: 40px auto 20px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    #floating-buttons {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .img-button {
+      width: 100px;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .img-button:hover {
+      transform: scale(1.05);
+    }
+
+    .item, .item2, .item3, .item4 {
+      position: absolute;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+      user-select: none;
+    }
+
+    .item { width: 200px; }
+    .item2 { width: 100px; }
+    .item3 { width: 70px; }
+    .item4 { width: 130px; }
+
+    .selected {
+      opacity: 0.4;
+    }
+
+    #status {
+      position: absolute;
+      bottom: 230px;
+      width: 100%;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: rgba(144, 202, 249, 1);
+      z-index: 5;
+    }
+
+    #selected-items {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px 0;
+      display: flex;
+      justify-content: center;
+      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .paper-frame {
+      background-image: url('paper.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 90%;
+      height: 270px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      pointer-events: auto;
+      border: none;
+      transform: translate(-5px, 20px);
+    }
+
+    #item-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .item-thumb {
+      width: 50px;
+      height: auto;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    /* Popup */
+    #popup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .popup-content {
+      position: relative;
+      background: url('paper_popup.png') no-repeat center center;
+      background-size: contain;
+      width: 90vw;
+      max-width: 450px;
+      max-height: 90vh;
+      padding: 40px 20px 30px;
+      box-sizing: border-box;
+      text-align: center;
+      color: #222;
+      overflow-y: auto;
+      border-radius: 12px;
+    }
+
+    .popup-content img#popup-img {
+      width: 120px;
+      height: auto;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    /* แสงวาวแบบ animation */
+    @keyframes shimmer {
+      0% {
+        filter: brightness(1) drop-shadow(0 0 2px #fff);
+      }
+      50% {
+        filter: brightness(1.5) drop-shadow(0 0 12px #fff);
+      }
+      100% {
+        filter: brightness(1) drop-shadow(0 0 2px #fff);
+      }
+    }
+    .popup-content img#popup-img.shiny {
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    .popup-content p {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .popup-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .popup-buttons button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: 'Kanit', sans-serif;
+      transition: background-color 0.3s ease;
+    }
+
+    .popup-buttons button:first-child {
+      background: #4caf50;
+      color: white;
+    }
+
+    .popup-buttons button:first-child:hover {
+      background: #45a049;
+    }
+
+    .popup-buttons button:nth-child(2) {
+      background: #2196F3;
+      color: white;
+    }
+
+    .popup-buttons button:nth-child(2):hover {
+      background: #1976d2;
+    }
+
+    .popup-buttons button:last-child {
+      background: #f44336;
+      color: white;
+    }
+
+    .popup-buttons button:last-child:hover {
+      background: #da190b;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 26px;
+      color: #444;
+      cursor: pointer;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-container">
+  <!-- ปุ่มคำใบ้ / กติกา / รีเซ็ต -->
+  <div id="floating-buttons">
+    <img src="btn_hint.png" class="img-button" alt="คำใบ้" onclick="showPopup('hint')">
+    <img src="btn_rule.png" class="img-button" alt="กติกา" onclick="showPopup('rule')">
+    <img src="btn_reset.png" class="img-button" alt="รีเซ็ต" onclick="resetGame()">
+  </div>
+
+  <!-- ไอเทมซ่อน -->
+  <img src="item1.png" id="item1" class="item" style="top: 900px; left: 400px;" onclick="handleItemClick(this)">
+  <img src="item2.png" id="item2" class="item2" style="top: 500px; left: 240px;" onclick="handleItemClick(this)">
+  <img src="item3.png" id="item3" class="item3" style="top: 650px; left: 400px;" onclick="handleItemClick(this)">
+  <img src="item4.png" id="item4" class="item4" style="top: 500px; left: 570px;" onclick="handleItemClick(this)">
+  <img src="item5.png" id="item5" class="item3" style="top: 378px; left: 380px;" onclick="handleItemClick(this)">
+  <img src="item6.png" id="item6" class="item" style="top: 258px; left: 450px;" onclick="handleItemClick(this)">
+  <img src="item7.png" id="item7" class="item" style="top: 300px; left: 120px;" onclick="handleItemClick(this)">
+
+  <!-- คะแนน -->
+  <div id="status">คะแนน: 0 / 20</div>
+
+  <!-- แถบรายการที่เลือก -->
+  <div id="selected-items">
+    <div class="paper-frame">
+      <div id="item-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup -->
+<div id="popup">
+  <div class="popup-content">
+    <span class="close-btn" onclick="closePopup()">×</span>
+    <img id="popup-img" src="" alt="รูปไอเทม">
+    <p id="popup-desc">ข้อมูลของไอเทม</p>
+    <div class="popup-buttons">
+      <button id="select-btn">เลือก</button>
+      <button id="confirm-btn">ตกลง</button>
+      <button onclick="closePopup()">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const correctItems = new Set(['item1', 'item3', 'item4', 'item5', 'item6']);
+  const scorePerItem = 4;
+  let selectedItems = new Set();
+  let currentItemId = null;
+  let confirmed = false; // สถานะกดตกลงล็อคคะแนนแล้ว
+
+  const itemDescriptions = {
+    item1: "เครื่องรางพญานาคจากลุ่มน้ำโขง เชื่อว่าให้โชคด้านการสอบและค้าขาย",
+    item2: "แจกันโบราณที่วางในห้องมานานเกือบร้อยปี",
+    item3: "ขวดน้ำมนต์ที่ใช้ในพิธีกรรมโบราณ",
+    item4: "รูปปั้นพญานาคทองคำ",
+    item5: "ตะกรุดเก่าแก่ที่แขวนอยู่ใกล้บันได",
+    item6: "หนังสือบุญผเวด ฉบับพิมพ์โบราณ",
+    item7: "ขวดน้ำมนต์ที่ใช้ในงานบุญผเวด"
+  };
+
+  const popupImg = document.getElementById("popup-img");
+  const popupDesc = document.getElementById("popup-desc");
+  const selectBtn = document.getElementById("select-btn");
+  const confirmBtn = document.getElementById("confirm-btn");
+
+  function handleItemClick(element) {
+    if (confirmed) return; // ถ้าล็อคแล้วห้ามเลือกเปลี่ยน
+
+    currentItemId = element.id;
+
+    popupDesc.textContent = itemDescriptions[currentItemId] || "ไม่มีข้อมูลของไอเทมนี้";
+
+    popupImg.src = element.src;
+    popupImg.classList.add("shiny");
+    popupImg.style.display = "block";
+
+    selectBtn.style.display = "inline-block";
+    confirmBtn.style.display = "inline-block";
+
+    selectBtn.textContent = selectedItems.has(currentItemId) ? "ยกเลิกเลือก" : "เลือก";
+
+    selectBtn.onclick = () => {
+      if (confirmed) return;
+      toggleSelect(document.getElementById(currentItemId));
+      selectBtn.textContent = selectedItems.has(currentItemId) ? "ยกเลิกเลือก" : "เลือก";
+    };
+
+    popup.style.display = "flex";
+  }
+
+  function toggleSelect(element) {
+    const id = element.id;
+
+    if (selectedItems.has(id)) {
+      selectedItems.delete(id);
+      element.classList.remove('selected');
+    } else {
+      selectedItems.add(id);
+      element.classList.add('selected');
+    }
+
+    updateScoreAndList();
+  }
+
+  function updateScoreAndList() {
+    let score = 0;
+    selectedItems.forEach(id => {
+      if (correctItems.has(id)) {
+        score += scorePerItem;
+      }
+    });
+
+    if (score > 20) score = 20;
+
+    document.getElementById('status').textContent = `คะแนน: ${score} / 20`;
+
+    const itemList = document.getElementById('item-list');
+    itemList.innerHTML = '';
+    selectedItems.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        const thumb = document.createElement('img');
+        thumb.src = el.src;
+        thumb.className = 'item-thumb';
+        itemList.appendChild(thumb);
+      }
+    });
+  }
+
+  function showPopup(type) {
+    if (confirmed) return; // ถ้าล็อคคะแนนแล้วไม่แสดงกติกาหรือคำใบ้อีก
+
+    if (type === "hint") {
+      popupDesc.textContent = "ลองมองหาสิ่งของที่วางอยู่ริมหน้าต่าง ใต้โต๊ะ หรือในมุมที่มืด";
+      popupImg.style.display = "none";
+      selectBtn.style.display = "none";
+      confirmBtn.style.display = "none";
+    } else if (type === "rule") {
+      popupDesc.innerHTML = `<img src="rule_image.png" style="width:100%">`;
+      popupImg.style.display = "none";
+      selectBtn.style.display = "none";
+      confirmBtn.style.display = "none";
+    }
+
+    popup.style.display = "flex";
+  }
+
+  function closePopup() {
+    popup.style.display = "none";
+    popupImg.classList.remove("shiny");
+    popupImg.style.display = "block";
+    selectBtn.style.display = "inline-block";
+    selectBtn.textContent = "เลือก";
+    confirmBtn.style.display = "inline-block";
+  }
+
+  function resetGame() {
+    if (confirmed) {
+      alert("คุณได้กดตกลงแล้ว ไม่สามารถรีเซ็ตได้");
+      return;
+    }
+
+    selectedItems.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('selected');
+    });
+    selectedItems.clear();
+    updateScoreAndList();
+  }
+
+  function confirmSelection() {
+    if (selectedItems.size === 0) {
+      alert("กรุณาเลือกอย่างน้อย 1 ไอเทมก่อนกดตกลง");
+      return;
+    }
+    confirmed = true;
+
+    closePopup();
+
+    selectBtn.style.display = "none";
+    confirmBtn.style.display = "none";
+
+    alert("บันทึกคะแนนเรียบร้อยแล้ว");
+  }
+
+  // อ้างอิง element popup ไว้ใช้ในฟังก์ชัน
+  const popup = document.getElementById("popup");
+</script>
+
+</body>
+</html>

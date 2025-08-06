@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ตะลุยละเล่นไทย - ด่านที่ 5</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Kanit', sans-serif;
+      background-image: url('5.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }
+    #gameWrapper {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      padding: 20px 16px 80px 16px;
+      position: relative;
+    }
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .option-btn {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 8px auto;
+      padding: 14px 0;
+      border: none;
+      border-radius: 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(90deg, #f7b733, #f7815f);
+      color: #fff;
+      box-shadow: 0 4px 8px rgba(247, 135, 95, 0.6);
+      transition: background 0.3s;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: linear-gradient(90deg, #f79233, #f55f4c);
+    }
+    .option-btn.correct {
+      background: #28a745 !important;
+      box-shadow: 0 4px 8px rgba(40, 167, 69, 0.7);
+    }
+    .option-btn.wrong {
+      background: #dc3545 !important;
+      box-shadow: 0 4px 8px rgba(220, 53, 69, 0.7);
+    }
+    .option-btn:disabled {
+      cursor: default;
+    }
+    #feedback {
+      text-align: center;
+      font-size: 1.1rem;
+      margin-top: 10px;
+      min-height: 30px;
+      font-weight: 600;
+    }
+    #navButtons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 28px;
+    }
+    #navButtons button {
+      flex: 1;
+      margin: 0 8px;
+      padding: 10px 0;
+      font-weight: 700;
+      border-radius: 24px;
+      border: none;
+      cursor: pointer;
+      color: white;
+      font-size: 1rem;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s;
+    }
+    #prevBtn {
+      background-color: #d9534f;
+    }
+    #prevBtn:hover:not(:disabled) {
+      background-color: #c9302c;
+    }
+    #nextBtn {
+      background-color: #28a745;
+    }
+    #nextBtn:hover:not(:disabled) {
+      background-color: #218838;
+    }
+    #prevBtn:disabled,
+    #nextBtn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="gameWrapper">
+  <h2 id="questionText"></h2>
+  <div id="optionsContainer"></div>
+  <div id="feedback"></div>
+
+  <div id="navButtons">
+    <button id="prevBtn" disabled>ย้อนกลับ</button>
+    <button id="nextBtn" disabled>ถัดไป</button>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    {
+      question: "โขนเป็นการแสดงพื้นบ้านของประเทศไทยประเภทใด?",
+      options: [
+        "การละเล่นพื้นบ้านที่เน้นการแสดงเสียงร้องและเครื่องดนตรีพื้นเมือง",
+        "นาฏศิลป์ที่ผสมผสานการร่ายรำและการเล่าเรื่องผ่านหน้ากากและเครื่องแต่งกายอย่างวิจิตร",
+        "การแสดงตลกพื้นบ้านที่ใช้บทพูดและท่าทางขบขัน",
+        "การละเล่นพื้นบ้านที่เน้นการแสดงเสียงร้องและเครื่องดนตรีพื้นเมือง"
+      ],
+      correctIndex: 1
+    },
+    {
+      question: "คนสมัยก่อนนิยมใช้อะไรทำเป็นของเล่น?",
+      options: ["พลาสติกและโลหะ", "วัสดุธรรมชาติ ไม้ไผ่ ดินเหนียว", "อิเล็กทรอนิกส์และแบตเตอรี่", "ยางและซิลิโคน"],
+      correctIndex: 1
+    },
+    {
+      question: "ม้าก้านกล้วยเป็นของเล่นพื้นบ้านที่มีลักษณะเด่นอย่างไรและมีความหมายทางวัฒนธรรมอย่างไร?",
+      options: [
+        "ทำจากก้านกล้วย ตกแต่งด้วยใบกล้วย ใช้แทนม้าในการละเล่น และสื่อถึงความผูกพันกับธรรมชาติและวิถีชีวิตชนบท",
+        "ทำจากไม้ไผ่และผ้าสี ใช้ในพิธีกรรมทางศาสนา เพื่อขอพรให้ฝนตกต้องตามฤดูกาล",
+        "ทำจากก้านกล้วยและดินเหนียว ใช้ในพิธีกรรมการบูชาผี เพื่อป้องกันภัย",
+        "ทำจากใบเตยและไม้ไผ่ ใช้เป็นเครื่องมือในการสื่อสารระหว่างหมู่บ้าน"
+      ],
+      correctIndex: 0
+    },
+    {
+      question: "ว่าวจุฬาแบบไหนที่มีหางยาวและใช้แข่งกลางลม?",
+      options: [
+        "ว่าวตัวเมีย แข่งกับว่าวงู",
+        "ว่าวตัวผู้ มีหางยาว ใช้แข่งกลางลม",
+        "ว่าวแบบจีนทำจากไม้ไผ่",
+        "ว่าวเล่นในงานวัด"
+      ],
+      correctIndex: 1
+    }
+  ];
+
+  const maxScorePerQuestion = 5;
+  let currentQ = 0;
+  let totalScore = 0;
+  const userAnswers = new Array(questions.length).fill(null);
+  const scoresPerQuestion = new Array(questions.length).fill(0);
+  const questionText = document.getElementById("questionText");
+  const optionsContainer = document.getElementById("optionsContainer");
+  const feedback = document.getElementById("feedback");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  function shuffle(array) {
+    const copy = [...array];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function renderQuestion() {
+    feedback.textContent = "";
+    nextBtn.disabled = true;
+    const q = questions[currentQ];
+    questionText.textContent = q.question;
+    optionsContainer.innerHTML = "";
+
+    const originalOptions = q.options.map((opt, i) => ({
+      text: opt,
+      isCorrect: i === q.correctIndex
+    }));
+    const shuffledOptions = shuffle(originalOptions);
+
+    shuffledOptions.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.textContent = opt.text;
+      btn.onclick = () => selectAnswer(opt.isCorrect, btn, shuffledOptions);
+      optionsContainer.appendChild(btn);
+    });
+
+    prevBtn.disabled = currentQ === 0;
+
+    if (userAnswers[currentQ] !== null) {
+      const buttons = optionsContainer.querySelectorAll("button");
+      buttons.forEach(btn => btn.disabled = true);
+      nextBtn.disabled = false;
+
+      const userAnswerText = userAnswers[currentQ];
+      buttons.forEach(btn => {
+        if (btn.textContent === userAnswerText) {
+          btn.classList.add(btn.textContent === shuffledOptions.find(o => o.isCorrect).text ? "correct" : "wrong");
+        }
+        if (btn.textContent === shuffledOptions.find(o => o.isCorrect).text) {
+          btn.classList.add("correct");
+        }
+      });
+
+      feedback.textContent = `ได้คะแนน ${scoresPerQuestion[currentQ]} คะแนน`;
+    }
+  }
+
+  function selectAnswer(isCorrect, button, options) {
+    if (userAnswers[currentQ] !== null) return;
+
+    const buttons = optionsContainer.querySelectorAll("button");
+    const correctText = options.find(o => o.isCorrect).text;
+
+    buttons.forEach(btn => {
+      btn.disabled = true;
+      if (btn.textContent === correctText) {
+        btn.classList.add("correct");
+      }
+    });
+
+    let earnedScore = isCorrect ? maxScorePerQuestion : 0;
+    if (!isCorrect) button.classList.add("wrong");
+
+    feedback.textContent = isCorrect
+      ? `ตอบถูก! ได้คะแนน ${earnedScore} คะแนน`
+      : `ตอบผิด! ได้คะแนน ${earnedScore} คะแนน`;
+
+    userAnswers[currentQ] = button.textContent;
+    scoresPerQuestion[currentQ] = earnedScore;
+    totalScore = scoresPerQuestion.reduce((a, b) => a + b, 0);
+    nextBtn.disabled = false;
+  }
+
+  nextBtn.addEventListener("click", () => {
+    if (userAnswers[currentQ] === null) return;
+    if (currentQ < questions.length - 1) {
+      currentQ++;
+      renderQuestion();
+    } else {
+      showEndScreen();
+    }
+  });
+
+  prevBtn.addEventListener("click", () => {
+    if (currentQ > 0) {
+      currentQ--;
+      renderQuestion();
+    }
+  });
+
+  function showEndScreen() {
+    questionText.textContent = "คุณเล่นครบทุกด่านแล้ว!";
+    optionsContainer.innerHTML = `
+      <div style="text-align: center; font-weight: 700; font-size: 1.2rem;">
+        <p>ขอบคุณที่ร่วมสนุก!</p>
+        <button onclick="goToMap()" style="
+          margin-top: 20px;
+          font-size: 1rem;
+          padding: 10px 20px;
+          background: #007bff;
+          color: white;
+          border: none;
+          border-radius: 20px;
+          cursor: pointer;">กลับสู่แผนที่</button>
+      </div>
+    `;
+    feedback.textContent = "";
+    prevBtn.style.display = "none";
+    nextBtn.style.display = "none";
+
+    localStorage.setItem("score_stage5", totalScore);
+    let done = JSON.parse(localStorage.getItem("completedStages")) || [];
+    if (!done.includes(5)) {
+      done.push(5);
+      localStorage.setItem("completedStages", JSON.stringify(done));
+    }
+  }
+
+  function goToMap() {
+    window.location.href = "Mean.html";
+  }
+
+  renderQuestion();
+</script>
+</body>
+</html>

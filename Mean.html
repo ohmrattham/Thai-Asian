@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>แผนที่ด่าน</title>
+  <style>
+    body, html {
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      font-family: sans-serif;
+      background: black;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .page {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #startPage {
+      background: url('m.png') center/cover no-repeat;
+      display: flex;
+    }
+
+    #mapPage {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: black;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      flex-direction: column;
+    }
+
+    .mapContainer {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      aspect-ratio: 9 / 16;
+      background: url('map.png') center/contain no-repeat;
+      margin: auto;
+    }
+
+    .circle {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 3px solid #b38c0f;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1em;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .circle:hover {
+      transform: scale(1.1);
+    }
+
+    .not-done {
+      background: #d62828;
+    }
+
+    .done {
+      background: #4caf50;
+    }
+
+    button {
+      position: absolute;
+      top: 85%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #078f34;
+      color: white;
+      padding: 12px 64px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #scoreDisplay {
+      position: absolute;
+      bottom: 20px;
+      right: 80px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #000;
+      z-index: 10;
+    }
+
+    #countdownTimer {
+  position: absolute;
+  top: 20px;
+  right: 20px; /* เปลี่ยนจาก left: 300px; */
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  padding: 12px 20px;
+  border-radius: 14px;
+  font-size: 19px;
+  font-weight: bold;
+  color: #4a2600;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  font-family: 'Kanit', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: pulse 1.5s infinite alternate;
+}
+
+
+#countdownTimer::before {
+  content: "⏳";
+  font-size: 22px;
+}
+
+
+    #popupOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #popupBox {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 32px;
+      max-width: 320px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+      position: relative;
+    }
+
+    #popupBox button {
+      margin-top: 20px;
+      background: #4caf50;
+      color: white;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+      box-shadow: 0 4px 8px rgba(76,175,80,0.6);
+      transition: background-color 0.3s ease;
+    }
+
+    #popupBox button:hover {
+      background: #388e3c;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="startPage" class="page">
+    <button onclick="goToMap()">ตกลง</button>
+  </div>
+
+  <div id="mapPage" class="page">
+    <div class="mapContainer" id="mapContainer"></div>
+    <div id="scoreDisplay">คะแนนรวม: 0/120</div>
+    <div id="countdownTimer">เวลา: 20:00</div>
+    <button onclick="resetProgress()" style="bottom: 70px;">รีเซ็ตความคืบหน้า</button>
+  </div>
+
+  <div id="popupOverlay">
+    <div id="popupBox">
+      <div id="popupMessage">ข้อความแจ้งเตือน</div>
+      <button onclick="closePopup()">ปิด</button>
+    </div>
+  </div>
+
+<!-- ใส่ไว้ในส่วน <script> ล่างสุดของ body -->
+<script>
+  const stages = [
+    { num: 1, top: '78%', left: '48%' },
+    { num: 2, top: '53.9%', left: '41.5%' },
+    { num: 3, top: '53.9%', left: '67%' },
+    { num: 4, top: '41.1%', left: '54%' },
+    { num: 5, top: '42.4%', left: '15%' },
+    { num: 6, top: '54%', left: '12%' }
+  ];
+
+  function goToMap() {
+    document.getElementById("startPage").style.display = "none";
+    document.getElementById("mapPage").style.display = "flex";
+    renderCircles();
+    startCountdown(); // เรียกนับถอยหลัง
+  }
+
+  function renderCircles() {
+    const cont = document.getElementById("mapContainer");
+    cont.innerHTML = '';
+    const completed = JSON.parse(localStorage.getItem('completedStages')) || [];
+
+    stages.forEach(s => {
+      const c = document.createElement('div');
+      c.className = 'circle ' + (completed.includes(s.num) ? 'done' : 'not-done');
+      c.style.top = s.top;
+      c.style.left = s.left;
+      c.textContent = s.num;
+      c.onclick = () => goToStage(s.num, completed.includes(s.num));
+      cont.appendChild(c);
+    });
+
+    let totalScore = 0;
+    for (let i = 1; i <= 5; i++) {
+      if (i === 4) continue;
+      let key = `score_stage${i}`;
+      let val = parseFloat(localStorage.getItem(key));
+      if (!isNaN(val)) totalScore += val;
+    }
+
+    const stage4 = parseFloat(localStorage.getItem('score_stage4_total')) || 0;
+    totalScore += stage4;
+
+    const buddhaScore = parseFloat(localStorage.getItem('score_buddha')) || 0;
+    const nagaScore = parseFloat(localStorage.getItem('score_naga')) || 0;
+    const robeScore = parseFloat(localStorage.getItem('score_robe')) || 0;
+    const stage6Score = buddhaScore + nagaScore + robeScore;
+    totalScore += stage6Score;
+
+    document.getElementById('scoreDisplay').textContent = `คะแนนรวมจริง: ${totalScore.toFixed(2)} / 120`;
+
+    if (completed.length === 6) {
+      setTimeout(() => {
+        window.location.href = 'Feedback.html';
+      }, 2000);
+    }
+  }
+
+  function goToStage(n, isDone) {
+    if (isDone) {
+      showPopup("ด่านนี้ทำแล้ว!");
+      return;
+    }
+    window.location.href = `${n}.html`;
+  }
+
+  function resetProgress() {
+    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตความคืบหน้า?")) {
+      localStorage.removeItem('completedStages');
+      for (let i = 1; i <= 5; i++) {
+        localStorage.removeItem(`score_stage${i}`);
+      }
+      localStorage.removeItem('score_stage4_total');
+      localStorage.removeItem('score_buddha');
+      localStorage.removeItem('score_naga');
+      localStorage.removeItem('score_robe');
+      localStorage.removeItem('gameEndTime'); // ล้างเวลานับถอยหลังด้วย
+      renderCircles();
+    }
+  }
+
+  function showPopup(message) {
+    document.getElementById('popupMessage').textContent = message;
+    document.getElementById('popupOverlay').style.display = 'flex';
+  }
+
+  function closePopup() {
+    document.getElementById('popupOverlay').style.display = 'none';
+  }
+
+  // ✅ นับถอยหลังแบบข้ามหน้าโดยใช้ localStorage
+  function startCountdown() {
+    const timerEl = document.getElementById('countdownTimer');
+
+    let endTime = localStorage.getItem('gameEndTime');
+
+    if (!endTime) {
+      endTime = Date.now() + 20 * 60 * 1000; // 20 นาที
+      localStorage.setItem('gameEndTime', endTime);
+    } else {
+      endTime = parseInt(endTime);
+    }
+
+    const countdownInterval = setInterval(() => {
+      const now = Date.now();
+      const diff = endTime - now;
+
+      if (diff <= 0) {
+        clearInterval(countdownInterval);
+        timerEl.textContent = "หมดเวลา!";
+        alert("หมดเวลาแล้ว! กรุณาทำแบบประเมินต่อ");
+        localStorage.removeItem('gameEndTime');
+        window.location.href = "Feedback.html";
+        return;
+      }
+
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      timerEl.textContent = `เวลา: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+  }
+</script>
+
+</body>
+</html>

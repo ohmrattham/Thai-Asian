@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>เกมพญานาค</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Kanit', sans-serif;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: linear-gradient(135deg, #1E3C34 0%, #125C50 100%);
+      color: #FFEFCB;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+    }
+
+    body {
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #1F6E5C;
+      border-radius: 20px;
+      padding: 30px 80px 40px 80px;
+      width: 90%;
+      max-width: 480px;
+      box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.4),
+        inset 0 0 10px rgba(255, 255, 255, 0.1);
+      text-align: center;
+      user-select: none;
+    }
+
+    h1, .intro-title {
+      background: linear-gradient(90deg, #FFD54F, #FFB300);
+      color: #1F2F2B;
+      padding: 15px 20px;
+      border-radius: 15px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      box-shadow: 0 3px 8px rgba(255, 213, 79, 0.7);
+      margin-bottom: 25px;
+      font-size: 1.6rem;
+    }
+
+    .intro-title {
+      font-size: 2.2rem;
+      line-height: 1.2;
+    }
+
+    .intro-sub {
+      margin-bottom: 25px;
+      font-size: 1.05rem;
+      color: #FFF4C2;
+      text-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
+    }
+
+    .game-img {
+      max-width: 280px;
+      margin: 0 auto 25px;
+      border-radius: 15px;
+      display: block;
+      position: relative;
+      z-index: 1;
+      filter:
+        drop-shadow(0 0 5px #FFD54F)
+        drop-shadow(0 0 10px #FFD54F)
+        drop-shadow(0 0 15px #FFD54F)
+        drop-shadow(0 0 20px #FFD54F)
+        drop-shadow(0 0 25px #FFD54F);
+      transition: transform 0.3s ease;
+    }
+
+    .game-img:hover {
+      transform: scale(1.05);
+    }
+
+    .intro-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .submit-btn {
+      padding: 14px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s, box-shadow 0.3s;
+      color: white;
+      background: linear-gradient(90deg, #F25C27, #F2994A);
+    }
+    .submit-btn:hover {
+      background: linear-gradient(90deg, #F2994A, #F25C27);
+      box-shadow: 0 8px 25px rgba(242, 92, 39, 0.75);
+    }
+
+    .submit-btn[style] {
+      background-color: #254E4C !important;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+    .submit-btn[style]:hover {
+      background-color: #2E6C68 !important;
+      box-shadow: 0 8px 25px rgba(46, 108, 104, 0.75);
+    }
+
+    .topic-buttons, .choices {
+      display: grid;
+      gap: 14px;
+    }
+
+    .topic-buttons {
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      margin-bottom: 30px;
+    }
+
+    .topic, .choice {
+      position: relative;
+      background-color: #2A8671;
+      padding: 16px 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #D3E9DF;
+      box-shadow: 0 4px 15px rgba(42, 134, 113, 0.5);
+      transition: background-color 0.3s, color 0.3s;
+      user-select: none;
+    }
+
+    .topic:hover, .choice:hover {
+      background-color: #3BA98B;
+      color: #FFF;
+      box-shadow: 0 6px 20px rgba(59, 169, 139, 0.75);
+    }
+
+    .choice.selected {
+      background-color: #FFE066;
+      color: #000;
+      font-weight: 700;
+      box-shadow: 0 6px 20px rgba(255, 224, 102, 0.85);
+    }
+
+    .topic .checkmark {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 1.3rem;
+      color: #FFD54F;
+      pointer-events: none;
+      user-select: none;
+      filter: drop-shadow(0 0 2px #b38600);
+    }
+
+    .result {
+      margin-top: 15px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      min-height: 1.5em;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .learn-content {
+      text-align: left;
+      background: rgba(255 255 255 / 0.15);
+      border-radius: 15px;
+      padding: 40px;
+      color: #FFF9D9;
+      line-height: 1.5;
+      max-height: 320px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 10px #FFD54Faa;
+    }
+
+    .learn-content h2 {
+      margin-top: 0;
+      color: #FFF;
+      text-shadow: 0 0 6px #FFD54F;
+    }
+
+    @media (max-width: 480px) {
+      .topic-buttons {
+        grid-template-columns: 1fr;
+      }
+      .submit-btn {
+        font-size: 1rem;
+      }
+      .learn-content {
+        max-height: 250px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- หน้าแรก -->
+    <div id="introScreen">
+      <div class="intro-title">พระพุทธ<br>และความเชื่อ </div>
+      <img src="buddha.png" alt="พระพุทธเจ้า" class="game-img" />
+      <div class="intro-sub">เรียนรู้เรื่องราวอิงลึกซึ้งของตำนานและศาสนา</div>
+      <div class="intro-buttons">
+        <button class="submit-btn" onclick="goToHome()">เริ่มเกม</button>
+        <button class="submit-btn" style="background-color: #254E4C;" onclick="showLearn()">เรียนรู้เพิ่มเติม</button>
+      </div>
+    </div>
+
+    <!-- หน้าเลือกหัวข้อ -->
+    <div id="homeScreen" class="hidden">
+      <h1>เลือกหัวข้ออานนท์รู้</h1>
+      <div class="topic-buttons"></div>
+    </div>
+
+    <!-- หน้าแสดงคำถาม -->
+    <div id="questionScreen" class="hidden">
+      <h1 id="questionTitle">หัวข้อ</h1>
+      <div class="question" id="questionText">คำถามจะแสดงตรงนี้</div>
+      <div class="choices" id="choicesArea"></div>
+      <button class="submit-btn" onclick="checkAnswer()">ส่งคำตอบ</button>
+      <div class="result" id="result"></div>
+      <button class="submit-btn" onclick="backHome()">ย้อนกลับ</button>
+    </div>
+
+    <!-- หน้าเรียนรู้เพิ่มเติม -->
+    <div id="learnScreen" class="hidden">
+      <h1>เรียนรู้เพิ่มเติม</h1>
+      <div class="learn-content" id="learnContent">
+        <!-- เนื้อหาแสดงที่นี่ -->
+      </div>
+      <button class="submit-btn" onclick="backToIntro()">กลับหน้าแรก</button>
+    </div>
+
+  </div>
+
+ <script>
+  const questions = {
+    buddha: [
+      {
+        text: "พระธาตุพนม ซึ่งเป็นพระธาตุศักดิ์สิทธิ์ในภาคอีสาน เชื่อว่าเป็นที่บรรจุพระอะไร?",
+        choices: ["พระเขี้ยวแก้ว", "พระอรหันต์", "พระบรมสารีริกธาตุ", "พระไตรปิฎก"],
+        correct: "พระบรมสารีริกธาตุ"
+      },
+      {
+        text: "พระพุทธเจ้าทรงตรัสรู้ที่ใด?",
+        choices: ["ลุมพินีวัน", "โพธิ์ใต้นั้น", "สาละ", "เมืองกบิลพัสดุ์"],
+        correct: "โพธิ์ใต้นั้น"
+      },
+      {
+        text: "คำว่า 'พระพุทธเจ้า' หมายถึงอะไร?",
+        choices: ["ผู้ตื่นแล้ว", "ผู้เป็นพระเจ้า", "ผู้มีเวทมนตร์", "ผู้ทรงอำนาจ"],
+        correct: "ผู้ตื่นแล้ว"
+      }
+    ],
+    naga: [
+      {
+        text: "พญานาคคืออะไรในตำนานไทย?",
+        choices: ["งูใหญ่", "เสือ", "ช้าง", "นก"],
+        correct: "งูใหญ่"
+      },
+      {
+        text: "พญานาคมักเกี่ยวข้องกับอะไรในความเชื่อไทย?",
+        choices: ["น้ำและแม่น้ำ", "ภูเขา", "ป่าไม้", "ดิน"],
+        correct: "น้ำและแม่น้ำ"
+      },
+      {
+        text: "พญานาคปรากฏในเทศกาลใดของไทย?",
+        choices: ["ประเพณีแห่เทียนพรรษา", "ประเพณีสงกรานต์", "ประเพณีออกพรรษา", "ประเพณีลอยกระทง"],
+        correct: "ประเพณีออกพรรษา"
+      }
+    ],
+    robe: [
+      {
+        text: "ผ้าผะวาดใช้ในโอกาสใด?",
+        choices: ["ทำวัตรเช้า", "ถวายพระ", "ปิดทอง", "สรงน้ำ"],
+        correct: "ถวายพระ"
+      },
+      {
+        text: "ผ้าผะวาดส่วนใหญ่ใช้ทำจากวัสดุอะไร?",
+        choices: ["ผ้าฝ้าย", "ผ้าไหม", "ผ้าลินิน", "ผ้าสักหลาด"],
+        correct: "ผ้าไหม"
+      },
+      {
+        text: "ผ้าผะวาดมักใช้ในพิธีกรรมประเภทใด?",
+        choices: ["พิธีทางศาสนา", "พิธีแต่งงาน", "พิธีเกษตร", "พิธีทางการศึกษา"],
+        correct: "พิธีทางศาสนา"
+      }
+    ]
+  };
+
+  const learnData = {
+    buddha: `
+      <h2>พระพุทธ</h2>
+      <p>พระพุทธเจ้าเป็นศาสดาของศาสนาพุทธ ท่านได้ตรัสรู้และสอนธรรมะให้กับมนุษย์ เพื่อให้หลุดพ้นจากทุกข์และเข้าถึงนิพพาน พระธาตุพนมถือเป็นสถานที่ศักดิ์สิทธิ์ เป็นที่บรรจุพระบรมสารีริกธาตุที่สำคัญของภาคอีสานไทย</p>
+    `,
+    naga: `
+      <h2>พญานาค</h2>
+      <p>พญานาคคือสิ่งมีชีวิตในตำนานไทยที่มีลักษณะเป็นงูขนาดใหญ่ เชื่อกันว่าพญานาคมีอำนาจเหนือธรรมชาติและเป็นผู้ปกป้องลำน้ำและแม่น้ำหลายสายในประเทศไทย ตำนานพญานาคยังเกี่ยวข้องกับความเชื่อเรื่องการเกิดและความศักดิ์สิทธิ์ในวัฒนธรรมไทย</p>
+    `,
+    robe: `
+      <h2>ผ้าผะวาด</h2>
+      <p>ผ้าผะวาดเป็นผ้าที่ใช้ในพิธีกรรมทางศาสนา โดยเฉพาะในการถวายพระผ้าจำนวนมากในโอกาสต่าง ๆ เช่น การถวายผ้าป่า หรือใช้ในพิธีสืบชะตาและพิธีทำบุญต่าง ๆ เพื่อแสดงความเคารพและความศรัทธาต่อพระสงฆ์</p>
+    `
+  };
+
+  let selectedAnswer = "";
+  let currentTopic = "";
+  let currentQIndex = 0;
+  let correctCount = 0;
+
+  function hideAllScreens() {
+    document.getElementById("introScreen").classList.add("hidden");
+    document.getElementById("homeScreen").classList.add("hidden");
+    document.getElementById("questionScreen").classList.add("hidden");
+    document.getElementById("learnScreen").classList.add("hidden");
+  }
+
+  function backToIntro() {
+    hideAllScreens();
+    document.getElementById("introScreen").classList.remove("hidden");
+  }
+
+  function showHome() {
+    hideAllScreens();
+    document.getElementById("homeScreen").classList.remove("hidden");
+
+    const topics = ["buddha", "naga", "robe"];
+    const container = document.querySelector(".topic-buttons");
+    container.innerHTML = "";
+
+    topics.forEach(key => {
+      const passed = localStorage.getItem(key) === "passed";
+      const div = document.createElement("div");
+      div.className = "topic";
+      div.textContent = {
+        buddha: "พระพุทธ",
+        naga: "พญานาค",
+        robe: "ผ้าผะวาด"
+      }[key];
+      div.onclick = () => startTopic(key);
+
+      if (passed) {
+        const check = document.createElement("span");
+        check.className = "checkmark";
+        check.textContent = "✔️";
+        div.appendChild(check);
+      }
+      container.appendChild(div);
+    });
+  }
+
+  function goToHome() {
+    showHome();
+  }
+
+  function startTopic(topic) {
+    currentTopic = topic;
+    currentQIndex = 0;
+    correctCount = 0;
+    showQuestion();
+  }
+
+  function showQuestion() {
+    hideAllScreens();
+    document.getElementById("questionScreen").classList.remove("hidden");
+    const q = questions[currentTopic][currentQIndex];
+    selectedAnswer = "";
+    document.getElementById("questionTitle").textContent = {
+      buddha: "พระพุทธ",
+      naga: "พญานาค",
+      robe: "ผ้าผะวาด"
+    }[currentTopic];
+    document.getElementById("questionText").textContent = q.text;
+
+    const choicesArea = document.getElementById("choicesArea");
+    choicesArea.innerHTML = "";
+    q.choices.forEach(choice => {
+      const div = document.createElement("div");
+      div.className = "choice";
+      div.textContent = choice;
+      div.onclick = () => selectAnswer(div);
+      choicesArea.appendChild(div);
+    });
+
+    document.getElementById("result").textContent = "";
+  }
+
+  function selectAnswer(el) {
+    document.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedAnswer = el.textContent.trim();
+  }
+
+ function checkAnswer() {
+  const result = document.getElementById("result");
+  const q = questions[currentTopic][currentQIndex];
+  if (selectedAnswer === "") {
+    result.textContent = "กรุณาเลือกคำตอบก่อนส่ง";
+    result.style.color = "#fff";
+    return;
+  }
+  if (selectedAnswer === q.correct) {
+    correctCount++;
+  }
+  currentQIndex++;
+  if (currentQIndex < questions[currentTopic].length) {
+    showQuestion();
+  } else {
+    // คำนวณคะแนนหัวข้อ (เต็ม 20)
+    const topicScore = correctCount * (20 / questions[currentTopic].length);
+
+    // เก็บคะแนนใน localStorage
+    saveScore(currentTopic, topicScore);
+
+    alert(`คุณได้ ${topicScore.toFixed(2)} คะแนนเต็ม 20 ในหัวข้อ "${document.getElementById("questionTitle").textContent}"`);
+
+    // ตรวจสอบว่าทำครบ 3 หัวข้อหรือยัง
+    const avg = calculateAverageScore();
+    if (avg !== null) {
+      alert(`คุณทำภารกิจครบทั้ง 3 หัวข้อแล้ว! คะแนนเฉลี่ย: ${avg.toFixed(2)} คะแนน`);
+
+      // ✅ เพิ่ม stage 6 เข้า completedStages
+      const completed = JSON.parse(localStorage.getItem('completedStages')) || [];
+      if (!completed.includes(6)) {
+        completed.push(6);
+        localStorage.setItem('completedStages', JSON.stringify(completed));
+      }
+
+      // ✅ กลับไปแผนที่
+      window.location.href = "Mean.html";
+    } else {
+      // ยังไม่ครบ 3 หัวข้อ ให้กลับหน้าหัวข้อปกติ
+      showHome();
+    }
+  }
+}
+
+
+function saveScore(topic, score) {
+  localStorage.setItem(`score_${topic}`, score);
+}
+
+function calculateAverageScore() {
+  const topics = ["buddha", "naga", "robe"];
+  let sum = 0;
+  let count = 0;
+
+  for (const topic of topics) {
+    const s = localStorage.getItem(`score_${topic}`);
+    if (s !== null) {
+      sum += parseFloat(s);
+      count++;
+    }
+  }
+
+  // ถ้ายังไม่ได้ทำครบทุกหัวข้อ ให้คืนค่า null
+  if (count < topics.length) return null;
+
+  return sum / topics.length;
+}
+
+
+  function showLearn() {
+    hideAllScreens();
+    document.getElementById("learnScreen").classList.remove("hidden");
+    document.getElementById("learnContent").innerHTML = `
+      ${learnData.buddha}
+      ${learnData.naga}
+      ${learnData.robe}
+    `;
+  }
+
+  backToIntro();
+
+  
+</script>
+</body>
+</html>

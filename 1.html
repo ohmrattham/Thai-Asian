@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ภารกิจวัฒนธรรมอีสาน - ด่านที่ 1</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-image: url('.png');
+    }
+
+    .page {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      aspect-ratio: 1080 / 1920;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      padding-bottom: 20px;
+      display: none;
+    }
+
+    .answer-block {
+      font-size: 18px;
+      position: absolute;
+      width: 50%;
+      height: 40px;
+      background: linear-gradient(to right, #f6d365, #fda085);
+      border-radius: 25px;
+      text-align: center;
+      line-height: 48px;
+      font-weight: bold;
+      border: 2px solid #8B4513;
+      cursor: pointer;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: all 0.3s ease;
+      box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .answer-block:hover {
+      transform: translateX(-50%) scale(1.03);
+      background: linear-gradient(to right, #f9b846, #f68445);
+      box-shadow: 0 0 12px rgba(255, 165, 0, 0.6);
+    }
+
+    .answer-block.selected {
+      background: linear-gradient(to right, #5c3317, #7a3e24);
+      color: white;
+      border: 2px solid #fff;
+      box-shadow: 0 0 16px rgba(255, 255, 255, 0.8);
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    #choice1 { top: 20%; }
+    #choice2 { top: 26%; }
+    #choice3 { top: 32%; }
+    #choice4 { top: 38%; }
+
+    .button-confirm,
+    .button-back {
+      position: absolute;
+      width: 120px;
+      height: 40px;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .button-confirm {
+      background-color: #009966;
+      left: 25%;
+      top: 44%;
+    }
+
+    .button-back {
+      background-color: #cc3333;
+      right: 25%;
+      top: 44%;
+    }
+
+    #welcomePage {
+      background-image: url('D1.png');
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #startBtn {
+      position: absolute;
+      top: 85%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #8B4513;
+      color: white;
+      padding: 12px 64px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #fireworksCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+
+<body>
+  <audio id="celebrationSound" src="celebration.mp3"></audio>
+
+  <!-- หน้าเริ่มต้น -->
+  <div id="welcomePage" class="page" style="display: flex;">
+    <button id="startBtn" onclick="startMission()">เริ่มภารกิจ</button>
+  </div>
+
+  <!-- หน้าคำถาม -->
+  <div id="questionPage" class="page">
+    <div class="answer-block" id="choice1" onclick="selectAnswer(1)"></div>
+    <div class="answer-block" id="choice2" onclick="selectAnswer(2)"></div>
+    <div class="answer-block" id="choice3" onclick="selectAnswer(3)"></div>
+    <div class="answer-block" id="choice4" onclick="selectAnswer(4)"></div>
+    <button class="button-back" onclick="prevQuestion()">ย้อนกลับ</button>
+    <button class="button-confirm" onclick="nextQuestion()">ถัดไป</button>
+  </div>
+
+ <!-- หน้าสาระความรู้แบบ Card -->
+<div id="knowledgePage" class="page" style="background-image: url('knowledge-bg.png'); display: none;">
+  <div style="padding: 20px; font-size: 16px; background: rgba(255,255,255,0.95); border-radius: 16px; margin: 30px auto; width: 92%; max-height: 80vh; overflow-y: auto;">
+    <h2 style="text-align: center; font-size: 24px; margin-bottom: 16px;">กลุ่มชาติพันธุ์ในภาคอีสาน</h2>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;">
+      <!-- Card Template -->
+       <div style="width: 280px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); overflow: hidden;">
+        <img src="esan.png" alt="ลาว" style="width: 100%; height: 180px; object-fit: cover;">
+        <div style="padding: 12px;">
+          <h3 style="margin: 0; font-size: 20px; color: #8B4513;">ภาคอีสาน</h3>
+          <p style="margin-top: 6px;">ภาคตะวันออกเฉียงเหนือ หรือที่รู้จักกันทั่วไปว่า “ภาคอีสาน” เป็นภูมิภาคที่ใหญ่ที่สุดของประเทศไทย ครอบคลุมพื้นที่กว่า 1 ใน 3 ของประเทศ และมีประชากรมากที่สุดในบรรดาทุกภาค ภูมิภาคนี้มีลักษณะภูมิประเทศเป็นที่ราบสูง แห้งแล้งในฤดูแล้ง และน้ำหลากในฤดูฝน โดยมีแม่น้ำโขงเป็นพรมแดนธรรมชาติกั้นระหว่างประเทศไทยกับประเทศลาว
+
+🧭 ภูมิศาสตร์และสภาพแวดล้อม
+ภาคอีสานตั้งอยู่บน ที่ราบสูงโคราช (Khorat Plateau) พื้นที่ส่วนใหญ่ประกอบด้วยดินทรายซึ่งมีความอุดมสมบูรณ์น้อย จึงทำให้วิถีชีวิตชาวอีสานผูกพันกับการเกษตรแบบพอเพียง ปลูกข้าวเหนียว มันสำปะหลัง และพืชทนแล้งอื่น ๆ
+
+🧬 กลุ่มชาติพันธุ์และภาษา
+ภาคอีสานเป็นดินแดนที่มีความหลากหลายทางชาติพันธุ์มากที่สุดแห่งหนึ่งในประเทศไทย ประชากรส่วนใหญ่มีเชื้อสายลาว และพูดภาษาอีสาน ซึ่งเป็นภาษาญาติใกล้ชิดกับภาษาลาว และมีเอกลักษณ์เฉพาะตัว
+
+นอกจากนี้ ยังมีกลุ่มชาติพันธุ์อื่น ๆ ที่มีวัฒนธรรม ภาษา และวิถีชีวิตเฉพาะของตนเอง ได้แก่</p>
+        </div>
+      </div>
+
+      <div style="width: 280px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); overflow: hidden;">
+        <img src="lao1.png" alt="ลาว" style="width: 100%; height: 180px; object-fit: cover;">
+        <div style="padding: 12px;">
+          <h3 style="margin: 0; font-size: 20px; color: #8B4513;">กลุ่มลาว</h3>
+          <p style="margin-top: 6px;">เป็นกลุ่มชาติพันธุ์หลักของภาคอีสาน พูดภาษาอีสาน (ลาวถิ่นไทย) มีประเพณีคล้ายประเทศลาว เช่น บุญบั้งไฟ หมอลำ ฯลฯ</p>
+        </div>
+      </div>
+
+      <div style="width: 280px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); overflow: hidden;">
+        <img src="1.2.png" alt="ภูไท" style="width: 100%; height: 180px; object-fit: cover;">
+        <div style="padding: 12px;">
+          <h3 style="margin: 0; font-size: 20px; color: #8B4513;">กลุ่มภูไท</h3>
+          <p style="margin-top: 6px;">พบในสกลนคร นครพนม มุกดาหาร มีการฟ้อนภูไท ภาษาเฉพาะ และวัฒนธรรมการแต่งกายที่โดดเด่น</p>
+        </div>
+      </div>
+
+      <div style="width: 280px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); overflow: hidden;">
+        <img src="yo.png" alt="ญ้อ" style="width: 100%; height: 180px; object-fit: cover;">
+        <div style="padding: 12px;">
+          <h3 style="margin: 0; font-size: 20px; color: #8B4513;">กลุ่มญ้อ</h3>
+          <p style="margin-top: 6px;">อาศัยในหนองคาย สกลนคร นครพนม มีประเพณีผีฟ้า ภาษาและการแต่งกายเฉพาะกลุ่ม</p>
+        </div>
+      </div>
+
+      <div style="width: 280px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); overflow: hidden;">
+        <img src="so.png" alt="โซ่" style="width: 100%; height: 180px; object-fit: cover;">
+        <div style="padding: 12px;">
+          <h3 style="margin: 0; font-size: 20px; color: #8B4513;">กลุ่มโซ่</h3>
+          <p style="margin-top: 6px;">พบในบึงกาฬ อุดรธานี มีภาษาท้องถิ่นและวัฒนธรรมที่สืบทอดมาหลายชั่วอายุคน</p>
+        </div>
+      </div>
+
+      <div style="width: 280px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); overflow: hidden;">
+        <img src="kaleung.png" alt="กะเลิง" style="width: 100%; height: 180px; object-fit: cover;">
+        <div style="padding: 12px;">
+          <h3 style="margin: 0; font-size: 20px; color: #8B4513;">กลุ่มกะเลิง</h3>
+          <p style="margin-top: 6px;">อยู่ในกาฬสินธุ์ มีศิลปะการฟ้อนรำ เครื่องแต่งกายดั้งเดิม และภาษาถิ่นเฉพาะ</p>
+        </div>
+      </div>
+
+      <div style="width: 280px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); overflow: hidden;">
+        <img src="suay.png" alt="กวย/สุรินทร์" style="width: 100%; height: 180px; object-fit: cover;">
+        <div style="padding: 12px;">
+          <h3 style="margin: 0; font-size: 20px; color: #8B4513;">กลุ่มกวย (กูย/สุรินทร์)</h3>
+          <p style="margin-top: 6px;">มีชื่อเสียงด้านการเลี้ยงช้าง วัฒนธรรมเกี่ยวข้องกับช้างและการแสดงพื้นเมือง</p>
+        </div>
+      </div>
+
+      <div style="width: 280px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); overflow: hidden;">
+        <img src="khmer.png" alt="เขมร" style="width: 100%; height: 180px; object-fit: cover;">
+        <div style="padding: 12px;">
+          <h3 style="margin: 0; font-size: 20px; color: #8B4513;">กลุ่มเขมร</h3>
+          <p style="margin-top: 6px;">พบในสุรินทร์ ศรีสะเกษ พูดภาษาเขมร มีประเพณีไหว้ผี การฟ้อนรำเขมร และดนตรีพื้นเมือง</p>
+        </div>
+      </div>
+
+      <div style="width: 280px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); overflow: hidden;">
+        <img src="vietnam1.png" alt="เวียดนาม" style="width: 100%; height: 180px; object-fit: cover;">
+        <div style="padding: 12px;">
+          <h3 style="margin: 0; font-size: 20px; color: #8B4513;">กลุ่มเวียดนาม</h3>
+          <p style="margin-top: 6px;">ตั้งถิ่นฐานในนครพนม มุกดาหาร มีอัตลักษณ์วัฒนธรรมแบบญวน และภาษาเวียดนาม</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 24px;">
+      <button onclick="goToMap()" style="padding: 10px 28px; font-size: 18px; background-color: #009966; color: white; border: none; border-radius: 12px; cursor: pointer;">กลับสู่แผนที่</button>
+    </div>
+  </div>
+</div>
+
+
+
+  <!-- ดอกไม้ไฟ -->
+  <canvas id="fireworksCanvas"></canvas>
+
+  <script>
+    const currentStage = 1;
+    const bgImages = ["D1.1.png", "D1.2.png", "D1.3.png", "D1.1.png"];
+    const correctAnswers = [3, 3, 2, 3];
+    const choiceTexts = [
+      ["14 ชาติพันธุ์", "6 ชาติพันธุ์", "17 ชาติพันธุ์", "10 ชาติพันธุ์"],
+      ["อาณาจักรล้านนา", "อาณาจักรอยุธยา", "อาณาจักรขอม", "อาณาจักรสุโขทัย"],
+      ["มุกดาหาร", "กาฬสินธ์ู", "ร้อยเอ็ด", "สุรินทร์"],
+      ["ภาษามอญ-เขมร", "ภาษาจีน-ทิเบต", "ภาษาตระกูลไท-กะได", "ภาษาตระกูลออสโตรเอเชียติก"]
+    ];
+
+    let current = 0;
+    let userAnswers = new Array(bgImages.length).fill(null);
+    let score = 0;
+
+    function startMission() {
+      document.getElementById("welcomePage").style.display = "none";
+      document.getElementById("questionPage").style.display = "block";
+      updateQuestion();
+    }
+
+    function selectAnswer(num) {
+      userAnswers[current] = num;
+      updateUI();
+    }
+
+    function updateUI() {
+      for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById("choice" + i);
+        btn.classList.remove("selected");
+        btn.textContent = choiceTexts[current][i - 1];
+      }
+      if (userAnswers[current]) {
+        document.getElementById("choice" + userAnswers[current]).classList.add("selected");
+      }
+    }
+
+    function updateQuestion() {
+      document.getElementById("questionPage").style.backgroundImage = `url('${bgImages[current]}')`;
+      updateUI();
+    }
+
+    function nextQuestion() {
+      if (userAnswers[current] === null) {
+        alert("กรุณาเลือกคำตอบก่อน");
+        return;
+      }
+      if (current < bgImages.length - 1) {
+        current++;
+        updateQuestion();
+      } else {
+        checkAnswers();
+      }
+    }
+
+    function prevQuestion() {
+      if (current > 0) {
+        current--;
+        updateQuestion();
+      }
+    }
+
+    function checkAnswers() {
+      score = 0;
+      for (let i = 0; i < correctAnswers.length; i++) {
+        if (userAnswers[i] === correctAnswers[i]) {
+          score += 5;
+        }
+      }
+
+      // บันทึกคะแนน
+      localStorage.setItem('score_stage1', score);
+
+      // บันทึกว่าผ่านแล้ว
+      const completed = JSON.parse(localStorage.getItem('completedStages')) || [];
+      if (!completed.includes(currentStage)) {
+        completed.push(currentStage);
+        localStorage.setItem('completedStages', JSON.stringify(completed));
+      }
+
+      triggerCelebration();
+      showKnowledge(); // ไม่แสดงคะแนน
+    }
+
+    function showKnowledge() {
+      document.getElementById("questionPage").style.display = "none";
+      document.getElementById("knowledgePage").style.display = "block";
+    }
+
+    function goToMap() {
+      window.location.href = "Mean.html";
+    }
+
+    function triggerCelebration() {
+      const canvas = document.getElementById("fireworksCanvas");
+      const ctx = canvas.getContext("2d");
+      const sound = document.getElementById("celebrationSound");
+      sound.play().catch(() => {});
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let particles = [];
+      for (let i = 0; i < 80; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          radius: Math.random() * 3 + 2,
+          color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+          speedX: (Math.random() - 0.5) * 10,
+          speedY: (Math.random() - 0.5) * 10,
+          alpha: 1
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          ctx.globalAlpha = p.alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+          p.x += p.speedX;
+          p.y += p.speedY;
+          p.alpha -= 0.02;
+        });
+        particles = particles.filter(p => p.alpha > 0);
+        if (particles.length > 0) requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+  </script>
+</body>
+
+</html>

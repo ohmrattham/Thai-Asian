@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>สรุปคะแนนแบบประเมิน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: #f8fafc;
+      margin: 0;
+      padding: 20px;
+      color: #1e293b;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 32px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #2563eb;
+      margin-bottom: 30px;
+    }
+    select {
+      font-size: 16px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      margin-bottom: 24px;
+      margin-right: 10px;
+    }
+    .loading {
+      text-align: center;
+      font-size: 16px;
+      color: #2563eb;
+      margin-bottom: 20px;
+    }
+    .respondent-count {
+      background: #fef3c7;
+      padding: 18px 24px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(234, 179, 8, 0.2);
+    }
+    .respondent-count .title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #b45309;
+      margin-bottom: 8px;
+    }
+    .respondent-count .value {
+      font-size: 26px;
+      font-weight: 600;
+      color: #92400e;
+    }
+    .total-score {
+      background: #e0e7ff;
+      padding: 18px 24px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+    .total-score .title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e40af;
+      margin-bottom: 12px;
+    }
+    .total-bar-container {
+      background: #c7d2fe;
+      border-radius: 12px;
+      height: 30px;
+      overflow: hidden;
+      margin: 0 auto 12px auto;
+      max-width: 400px;
+    }
+    .total-bar {
+      height: 100%;
+      background-color: #1e40af;
+      transition: width 0.5s;
+    }
+    .total-score .value {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+    .summary {
+      margin-bottom: 24px;
+    }
+    .question-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .bar-container {
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 22px;
+      margin-bottom: 8px;
+    }
+    .bar {
+      height: 100%;
+      background-color: #2563eb;
+      transition: width 0.5s;
+    }
+    .score {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #0f172a;
+    }
+    canvas {
+      margin-top: 30px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>สรุปผลแบบประเมินเกม</h1>
+
+  <label>เลือกเดือนและปี:</label>
+  <select id="monthSelect"></select>
+  <select id="yearSelect"></select>
+
+  <div class="loading" id="loading" style="display:none;">กำลังโหลดข้อมูล...</div>
+
+  <div class="respondent-count" id="respondentCount" style="display:none;">
+    <div class="title">จำนวนผู้เข้าทำแบบประเมิน</div>
+    <div class="value" id="respondentValue">0 คน</div>
+  </div>
+
+  <div class="total-score" id="totalScore" style="display:none;">
+    <div class="title">คะแนนเฉลี่ยรวมทั้งหมด</div>
+    <div class="total-bar-container">
+      <div class="total-bar" id="totalBar" style="width:0;"></div>
+    </div>
+    <div class="value" id="totalValue">0 / 5</div>
+  </div>
+
+  <div class="summary" id="summaryArea"></div>
+  <canvas id="barChart" width="400" height="300"></canvas>
+
+  <div class="footer">
+    © 2025 ทีมงานพัฒนาเกมวัฒนธรรม By OHM_Rattham
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDGYCGAtPuhjhkKKMekfI7HhvG30eDQ2qM",
+    authDomain: "feedback-a512f.firebaseapp.com",
+    projectId: "feedback-a512f",
+    storageBucket: "feedback-a512f.firebasestorage.app",
+    messagingSenderId: "493491136093",
+    appId: "1:493491136093:web:5a3d6f594deedfefe90fb4",
+    measurementId: "G-97MSGTXNGB"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const monthSelect = document.getElementById('monthSelect');
+  const yearSelect = document.getElementById('yearSelect');
+  const summaryArea = document.getElementById('summaryArea');
+  const loading = document.getElementById('loading');
+  const totalScoreDiv = document.getElementById('totalScore');
+  const totalBar = document.getElementById('totalBar');
+  const totalValue = document.getElementById('totalValue');
+  const respondentCount = document.getElementById('respondentCount');
+  const respondentValue = document.getElementById('respondentValue');
+  let barChart = null;
+
+  const questions = {
+    fun: "1. ความสนุกของเกม",
+    difficulty: "2. ความเหมาะสมของความยาก",
+    design: "3. ความพึงพอใจในกราฟิก",
+    knowledge: "4. ความรู้และสาระประโยชน์"
+  };
+
+  function fillMonthYearSelectors() {
+    const now = new Date();
+    for (let m = 0; m < 12; m++) {
+      const monthName = new Date(0, m).toLocaleString('th-TH', { month: 'long' });
+      const option = document.createElement('option');
+      option.value = m;
+      option.textContent = monthName;
+      if (m === now.getMonth()) option.selected = true;
+      monthSelect.appendChild(option);
+    }
+
+    const thisYear = now.getFullYear();
+    for (let y = thisYear - 3; y <= thisYear + 1; y++) {
+      const option = document.createElement('option');
+      option.value = y;
+      option.textContent = y + 543; // แสดงปี พ.ศ.
+      if (y === thisYear) option.selected = true;
+      yearSelect.appendChild(option);
+    }
+  }
+
+  function calculateAverage(arr, key) {
+    if (arr.length === 0) return 0;
+    const sum = arr.reduce((acc, obj) => acc + Number(obj[key]), 0);
+    return (sum / arr.length);
+  }
+
+  function renderBarChart(averages) {
+    const ctx = document.getElementById('barChart').getContext('2d');
+    const labels = Object.keys(questions).map(key => questions[key]);
+    const data = Object.keys(questions).map(key => averages[key].toFixed(2));
+
+    if (barChart) barChart.destroy();
+
+    barChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'คะแนนเฉลี่ย',
+          data: data,
+          backgroundColor: '#2563eb'
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true, max: 5 }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  }
+
+  function renderSummary(responses) {
+    summaryArea.innerHTML = "";
+
+    if (responses.length === 0) {
+      summaryArea.innerHTML = "<p>ไม่มีข้อมูลสำหรับเดือนที่เลือก</p>";
+      totalScoreDiv.style.display = "none";
+      respondentCount.style.display = "none";
+      return;
+    }
+
+    respondentCount.style.display = "block";
+    respondentValue.textContent = `${responses.length} คน`;
+
+    const averages = {};
+    let totalSum = 0;
+    let count = 0;
+
+    for (let key in questions) {
+      averages[key] = calculateAverage(responses, key);
+      totalSum += averages[key];
+      count++;
+    }
+
+    const totalAvg = (totalSum / count).toFixed(2);
+
+    totalScoreDiv.style.display = "block";
+    totalBar.style.width = (totalAvg / 5 * 100) + "%";
+    totalValue.textContent = `${totalAvg} / 5`;
+
+    for (let key in questions) {
+      const avg = averages[key].toFixed(2);
+      const percent = (avg / 5) * 100;
+      const section = document.createElement("div");
+      section.innerHTML = `
+        <div class="question-title">${questions[key]}</div>
+        <div class="bar-container"><div class="bar" style="width:${percent}%"></div></div>
+        <div class="score">คะแนนเฉลี่ย: ${avg} / 5</div>
+      `;
+      summaryArea.appendChild(section);
+    }
+
+    renderBarChart(averages);
+  }
+
+  async function loadDataByMonthYear(month, year) {
+    loading.style.display = "block";
+    summaryArea.innerHTML = "";
+    totalScoreDiv.style.display = "none";
+    respondentCount.style.display = "none";
+
+    const start = new Date(Date.UTC(year, month, 1));
+    const end = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));
+
+    try {
+      const snapshot = await db.collection("feedbacks")
+        .where("timestamp", ">=", start)
+        .where("timestamp", "<=", end)
+        .get();
+
+      const responses = [];
+      snapshot.forEach(doc => responses.push(doc.data()));
+      renderSummary(responses);
+    } catch (err) {
+      console.error(err);
+      summaryArea.innerHTML = "<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>";
+    } finally {
+      loading.style.display = "none";
+    }
+  }
+
+  fillMonthYearSelectors();
+  monthSelect.addEventListener('change', () => {
+    loadDataByMonthYear(parseInt(monthSelect.value), parseInt(yearSelect.value));
+  });
+  yearSelect.addEventListener('change', () => {
+    loadDataByMonthYear(parseInt(monthSelect.value), parseInt(yearSelect.value));
+  });
+  loadDataByMonthYear(new Date().getMonth(), new Date().getFullYear());
+</script>
+
+</body>
+</html>

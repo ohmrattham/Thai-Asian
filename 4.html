@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ภารกิจอาเซียน รวม</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      font-family: sans-serif;
+      background: black;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .page {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .active { display: flex; }
+
+    #page1 {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      overflow: hidden;
+    }
+
+    #container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+    }
+
+    #dropzoneWrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .dropzone {
+      position: absolute;
+      width: 30px;
+      height: 20px;
+      border: 2px dashed rgba(255,255,255,0.8);
+      border-radius: 5px;
+      background: rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    #flagBox {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      background-color: transparent;
+      padding: 0px;
+      width: calc((85px + 10px) * 5);
+    }
+
+    .flag {
+      width: 65px;
+      height: 40px;
+      cursor: grab;
+    }
+
+    .flag.placed {
+      cursor: default;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #score {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    #nextBtn {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      font-size: 18px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: none;
+    }
+
+    #page2 {
+      width: 100vw;
+      height: 100vh;
+      background-image: url('b4.2.png');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      overflow-y: auto;
+      color: white;
+    }
+
+    #page2 .container {
+      padding: 50px 20px;
+      background-color: rgba(0, 0, 0, 0.5);
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+      margin: auto;
+    }
+
+    .character img {
+      width: 200px;
+      max-width: 80%;
+      border-radius: 20px;
+    }
+
+    .question {
+      font-size: 24px;
+      margin: 20px 0;
+    }
+
+    .choices button {
+      display: block;
+      width: 80%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffcc00;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="page1" class="page active">
+  <div id="container">
+    <img id="map" src="asean_map.png" />
+    <div id="dropzoneWrapper">
+      <div class="dropzone" data-country="ไทย"></div>
+      <div class="dropzone" data-country="เวียดนาม"></div>
+      <div class="dropzone" data-country="มาเลเซีย"></div>
+      <div class="dropzone" data-country="อินโดนีเซีย"></div>
+      <div class="dropzone" data-country="ฟิลิปปินส์"></div>
+      <div class="dropzone" data-country="ลาว"></div>
+      <div class="dropzone" data-country="พม่า"></div>
+      <div class="dropzone" data-country="กัมพูชา"></div>
+      <div class="dropzone" data-country="สิงคโปร์"></div>
+      <div class="dropzone" data-country="บรูไน"></div>
+    </div>
+  </div>
+  <div id="flagBox">
+    <img src="thailand.png" class="flag" draggable="true" data-country="ไทย" />
+    <img src="vietnam.png" class="flag" draggable="true" data-country="เวียดนาม" />
+    <img src="malaysia.png" class="flag" draggable="true" data-country="มาเลเซีย" />
+    <img src="indonesia.png" class="flag" draggable="true" data-country="อินโดนีเซีย" />
+    <img src="philippines.png" class="flag" draggable="true" data-country="ฟิลิปปินส์" />
+    <img src="laos.png" class="flag" draggable="true" data-country="ลาว" />
+    <img src="myanmar.png" class="flag" draggable="true" data-country="พม่า" />
+    <img src="cambodia.png" class="flag" draggable="true" data-country="กัมพูชา" />
+    <img src="singapore.png" class="flag" draggable="true" data-country="สิงคโปร์" />
+    <img src="brunei.png" class="flag" draggable="true" data-country="บรูไน" />
+  </div>
+  <div id="score">คะแนน: 0 / 10</div>
+  <button id="nextBtn" onclick="goToPage2()">ถัดไป</button>
+</div>
+
+<div id="page2" class="page">
+  <div class="container">
+    <div id="character" class="character"></div>
+    <div id="question" class="question"></div>
+    <div class="choices" id="choices"></div>
+  </div>
+</div>
+
+<script>
+const map = document.getElementById('map');
+const dropzoneWrapper = document.getElementById('dropzoneWrapper');
+
+const dropzonePositions = {
+  "ไทย": { top: 31, left: 34 },
+  "เวียดนาม": { top: 36, left: 52 },
+  "มาเลเซีย": { top: 47, left: 36 },
+  "อินโดนีเซีย": { top: 56, left: 39 },
+  "ฟิลิปปินส์": { top: 29, left: 84 },
+  "ลาว": { top: 25, left: 38 },
+  "พม่า": { top: 24, left: 20 },
+  "กัมพูชา": { top: 35, left: 43 },
+  "สิงคโปร์": { top: 52, left: 44 },
+  "บรูไน": { top: 49, left: 63 },
+};
+
+function adjustDropzones() {
+  const containerRect = map.parentElement.getBoundingClientRect();
+  const imgRatio = map.naturalWidth / map.naturalHeight;
+  const containerRatio = containerRect.width / containerRect.height;
+
+  let displayedWidth, displayedHeight;
+  if (containerRatio > imgRatio) {
+    displayedHeight = containerRect.height;
+    displayedWidth = displayedHeight * imgRatio;
+  } else {
+    displayedWidth = containerRect.width;
+    displayedHeight = displayedWidth / imgRatio;
+  }
+
+  dropzoneWrapper.style.width = displayedWidth + "px";
+  dropzoneWrapper.style.height = displayedHeight + "px";
+
+  document.querySelectorAll('.dropzone').forEach(zone => {
+    const pos = dropzonePositions[zone.dataset.country];
+    if (pos) {
+      zone.style.top = pos.top + "%";
+      zone.style.left = pos.left + "%";
+    }
+  });
+}
+
+window.addEventListener('resize', adjustDropzones);
+window.addEventListener('load', () => {
+  adjustDropzones();
+  updateScore();
+});
+
+// Drag & Drop
+const flags = document.querySelectorAll('.flag');
+flags.forEach(flag => {
+  flag.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', flag.dataset.country);
+  });
+});
+
+const dropzones = document.querySelectorAll('.dropzone');
+dropzones.forEach(zone => {
+  zone.addEventListener('dragover', e => e.preventDefault());
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    const dropped = e.dataTransfer.getData('text/plain');
+    const flag = document.querySelector(`.flag[data-country="${dropped}"]`);
+    if (!zone.hasChildNodes() && flag) {
+      zone.appendChild(flag);
+      flag.classList.add('placed');
+      flag.style.position = 'absolute';
+      flag.style.left = '0';
+      flag.style.top = '0';
+      flag.style.cursor = 'default';
+      updateScore();
+    }
+  });
+});
+
+function updateScore() {
+  const placedFlagsCount = document.querySelectorAll('.flag.placed').length;
+  const score = placedFlagsCount;  // คะแนนเต็ม 10 (ธงละ 1 คะแนน)
+  document.getElementById('score').textContent = `คะแนน: ${score} / 10`;
+  localStorage.setItem('score_stage4_part1', score); // เก็บคะแนนวางธง
+  if (placedFlagsCount === 10) {
+    document.getElementById('nextBtn').style.display = 'block';
+  } else {
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+}
+
+function goToPage2() {
+  document.getElementById("page1").classList.remove("active");
+  document.getElementById("page2").classList.add("active");
+  loadCharacter();
+}
+
+// ภารกิจ 2: เกมตอบคำถาม
+const characters = [
+  {
+    image: "char1.png",
+    question: "หญิงสาวคนนี้จะทักทายว่าอะไร?",
+    choices: ["สวัสดีค่ะ!", "สบายดี!", "ชินจ้าวว!"],
+    correct: 0
+  },
+  {
+    image: "char2.png",
+    question: "ชายหนุ่มอาเซียนพูดว่าอะไร?",
+    choices: ["ซาลามัต ดาตัง!", "สบายดี?", "กูมุสตา"],
+    correct: 1
+  },
+  {
+    image: "char3.png",
+    question: "เด็กนักเรียนพูดว่าอะไร?",
+    choices: ["ซินจ่าว!", "กูมุสตา", "ซาลามัต ดาตัง!"],
+    correct: 1
+  }
+];
+
+let index = 0;
+let score2 = 0;
+
+function loadCharacter() {
+  if (index >= characters.length) {
+    // รวมคะแนนทั้งสองเกม
+    let score1 = Number(localStorage.getItem('score_stage4_part1')) || 0;
+    let totalScore = score1 + score2;  // คะแนนรวม
+    if (totalScore > 20) totalScore = 20; // กันเกิน 20
+
+    document.getElementById("character").innerHTML = "<h2>\u2705 จบเกม!</h2>";
+    document.getElementById("question").innerHTML = `คุณได้คะแนนรวม: ${totalScore.toFixed(2)} / 20`;
+    document.getElementById("choices").innerHTML = "";
+
+    // เพิ่มเข้า localStorage ว่าทำด่านนี้เสร็จแล้ว พร้อมเก็บคะแนนรวม
+    let completed = JSON.parse(localStorage.getItem('completedStages')) || [];
+    if (!completed.includes(4)) {
+      completed.push(4);
+      localStorage.setItem('completedStages', JSON.stringify(completed));
+    }
+    localStorage.setItem('score_stage4_total', totalScore);
+
+    // แสดง popup แจ้งผ่านด่านก่อนเด้งกลับ (แก้เป็นชื่อไฟล์แผนที่จริงของคุณ)
+    alert(`คุณทำภารกิจด่านที่ 4 สำเร็จ! คะแนนรวม: ${totalScore.toFixed(2)} / 20`);
+    setTimeout(() => {
+      window.location.href = "Mean.html"; // เปลี่ยนตามชื่อไฟล์แผนที่
+    }, 1000);
+    return;
+  }
+
+  const c = characters[index];
+  document.getElementById("character").innerHTML = `<img src="${c.image}" alt="character">`;
+  document.getElementById("question").innerHTML = c.question;
+
+  const choicesDiv = document.getElementById("choices");
+  choicesDiv.innerHTML = "";
+
+  c.choices.forEach((choice, i) => {
+    const btn = document.createElement("button");
+    btn.innerText = choice;
+    btn.onclick = () => {
+      if (i === c.correct) {
+        score2 += 3.33;  // คะแนนเต็ม 10 / 3 ข้อ = ประมาณ 3.33 คะแนนต่อข้อถูก
+      }
+      index++;
+      loadCharacter();
+    };
+    choicesDiv.appendChild(btn);
+  });
+}
+</script>
+
+
+</body>
+</html>

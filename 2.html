@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>เอัดกิน เอัดล้าง เกมภาพ</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+    body {
+      margin: 0;
+      font-family: 'Kanit', sans-serif;
+      background: url('2.png') no-repeat center top;
+      background-size: cover;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding: 10px;
+    }
+    .game-box {
+      background: white;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 16px;
+      margin-bottom: 100px;
+      padding: 20px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .question-title {
+      font-size: 20px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+    .question-img {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      max-height: 280px;
+      object-fit: contain;
+    }
+    .option {
+      display: block;
+      background: #e0f7fa;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: 600;
+      user-select: none;
+    }
+    .option:hover {
+      background: #b2ebf2;
+    }
+    .score, .highscore {
+      display: none;
+      font-weight: 700;
+    }
+    .score {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #0277bd;
+    }
+    .highscore {
+      font-size: 14px;
+      color: #01579b;
+      margin-top: 5px;
+    }
+    .water-animation {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 30px;
+      background: linear-gradient(to right, #4fc3f7, #81d4fa);
+      animation: flow 2s linear infinite;
+      opacity: 0.8;
+      z-index: 1;
+      border-radius: 0 0 16px 16px;
+    }
+    @keyframes flow {
+      0% { background-position: 0 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .answer-review {
+      max-height: 450px;
+      overflow-y: auto;
+      margin-top: 35px;
+      text-align: left;
+      padding-right: 10px;
+      border-top: 2px solid #4fc3f7;
+    }
+    .review-item {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #b3e5fc;
+    }
+    .review-item img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      object-fit: contain;
+      max-height: 240px;
+    }
+    .review-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #0277bd;
+      margin-bottom: 6px;
+    }
+    .review-text {
+      font-size: 18px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .btn-index {
+      margin-top: 12px;
+      background: #1db34a;
+      color: white;
+      font-size: 18px;
+      border: none;
+      padding: 20px 0;
+      border-radius: 8px;
+      width: 100%;
+      cursor: pointer;
+      font-weight: bold;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+    .btn-index:hover {
+      background: #01579b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="water-animation" id="water"></div>
+
+  <div class="game-box" id="game">
+    <div class="question-title">ภาพนี้คืออะไร?</div>
+    <img id="question-img" class="question-img" src="" alt="รูปภาพคำถาม" />
+    <div id="options"></div>
+    <div class="score" id="score">คะแนน: 0</div>
+    <div class="highscore" id="highscore">แต้มสูงสุด: 0</div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        img: "m1.png",
+        answer: "ระหัดวิดน้ำ-ลำตะคลอง",
+        distractors: ["เครื่องตีน้ำในบ่อปลา", "ล้อไม้ระบายน้ำ"],
+        info: "ระหัดวิดน้ำเป็นเครื่องมือใช้ตักน้ำจากคลองหรือลำธารเพื่อใช้ในนาและการเกษตร โดยอาศัยแรงหมุนจากคนหรือสัตว์"
+      },
+      {
+        img: "m2.png",
+        answer: "ตุ้มปลายอน",
+        distractors: ["ลอบนอน", "ไซ", "ยุ้งข้าว"],
+        info: "ตุ้มปลายอนเป็นเครื่องมือดักปลาที่นิยมใช้ในชนบทไทย ทำจากไม้ไผ่ มีลักษณะเป็นกรงดักปลาแบบง่าย"
+      },
+      {
+        img: "m3.png",
+        answer: "เฒ่าตาปุ๊ก",
+        distractors: ["ฟางข้าว", "หุ่นไล่กา", "กระบุง"],
+        info: "เฒ่าตาปุ๊กเป็นสัญลักษณ์ของคนแก่ผู้มีภูมิปัญญาท้องถิ่น และมักเป็นผู้เล่าเรื่องหรือสืบสานวัฒนธรรม"
+      },
+      {
+        img: "m4.png",
+        answer: "ยุ้งข้าว",
+        distractors: ["เล้าไก่", "โรงเรือนพืชผล", "เล้าโค"],
+        info: "ยุ้งข้าวคือที่เก็บรักษาข้าวเปลือกหลังเก็บเกี่ยว มีโครงสร้างช่วยระบายอากาศ ป้องกันความชื้นและแมลง"
+      },
+      {
+        img: "m5.png",
+        answer: "ม้าซอยยา",
+        distractors: ["เครื่องฝนสมุนไพร", "เกวียนบดพริก", "ครกหิน"],
+        info: "ม้าซอยยาเป็นเครื่องมือที่ใช้หั่นสมุนไพรหรือยาสมุนไพรในชนบทแบบดั้งเดิม โดยมีลักษณะเป็นมีดติดคันโยก"
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    const imgEl = document.getElementById("question-img");
+    const optionsEl = document.getElementById("options");
+    const scoreEl = document.getElementById("score");
+    const highscoreEl = document.getElementById("highscore");
+    const gameBox = document.getElementById("game");
+    const titleEl = document.querySelector(".question-title");
+
+    function loadQuestion() {
+      if (current >= questions.length) {
+        imgEl.style.display = "none";
+        optionsEl.style.display = "none";
+        titleEl.textContent = `คุณได้ทำภารกิจในด่านนี้เสร็จแล้ว`;
+
+        // ซ่อนคะแนน
+        scoreEl.style.display = 'none';
+        highscoreEl.style.display = 'none';
+
+        // เก็บคะแนนไว้ใน localStorage (ถ้าคะแนนมากกว่า)
+        const oldScore = parseFloat(localStorage.getItem('score_stage2')) || 0;
+        const newScore = score * 4;
+        if (newScore > oldScore) {
+          localStorage.setItem('score_stage2', newScore);
+        }
+
+        // เพิ่มด่าน 2 ใน completedStages
+        const completedStages = JSON.parse(localStorage.getItem('completedStages')) || [];
+        if (!completedStages.includes(2)) {
+          completedStages.push(2);
+          localStorage.setItem('completedStages', JSON.stringify(completedStages));
+        }
+
+        // เพิ่มหัวข้อ "ข้อมูลสาระความรู้"
+        const reviewTitle = document.createElement("h2");
+        reviewTitle.textContent = "ข้อมูลสาระความรู้";
+        reviewTitle.style.marginTop = "28px";
+        reviewTitle.style.color = "#0288d1";
+        reviewTitle.style.fontSize = "25px";
+        reviewTitle.style.textAlign = "left";
+        gameBox.appendChild(reviewTitle);
+
+        // สร้างกล่องเฉลย
+        const reviewDiv = document.createElement("div");
+        reviewDiv.className = "answer-review";
+
+        questions.forEach(q => {
+          const item = document.createElement("div");
+          item.className = "review-item";
+
+          const img = document.createElement("img");
+          img.src = q.img;
+          img.alt = q.answer;
+
+          const title = document.createElement("div");
+          title.className = "review-title";
+          title.textContent = q.answer;
+
+          const text = document.createElement("div");
+          text.className = "review-text";
+          text.textContent = q.info;
+
+          item.appendChild(img);
+          item.appendChild(title);
+          item.appendChild(text);
+
+          reviewDiv.appendChild(item);
+        });
+
+        gameBox.appendChild(reviewDiv);
+
+        const btnBack = document.createElement("button");
+        btnBack.textContent = "กลับหน้าหลัก";
+        btnBack.className = "btn-index";
+        btnBack.onclick = () => {
+          window.location.href = "Mean.html";
+        };
+        gameBox.appendChild(btnBack);
+
+        return;
+      }
+
+      const q = questions[current];
+      imgEl.src = q.img;
+      imgEl.alt = q.answer;
+      imgEl.style.display = "block";
+      optionsEl.style.display = "block";
+      optionsEl.innerHTML = "";
+      titleEl.textContent = "ภาพนี้คืออะไร?";
+      scoreEl.style.display = 'none';
+      highscoreEl.style.display = 'none';
+
+      let filteredDistractors = q.distractors.filter(opt => opt !== q.answer);
+      const allOptions = [q.answer, ...filteredDistractors];
+      const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
+
+      shuffledOptions.forEach(opt => {
+        const btn = document.createElement("div");
+        btn.className = "option";
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (opt === q.answer) {
+            score++;
+            document.getElementById('water').style.animationDuration = `${2 - score * 0.2}s`;
+          }
+          current++;
+          loadQuestion();
+        };
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
