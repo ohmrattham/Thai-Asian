@@ -181,7 +181,7 @@
 
   <div id="mapPage" class="page">
     <div class="mapContainer" id="mapContainer"></div>
-    <div id="scoreDisplay">คะแนนรวม: 0/120</div>
+
     <div id="countdownTimer">เวลา: 20:00</div>
     <button onclick="resetProgress()" style="bottom: 70px;">รีเซ็ตความคืบหน้า</button>
   </div>
@@ -243,7 +243,7 @@
     const stage6Score = buddhaScore + nagaScore + robeScore;
     totalScore += stage6Score;
 
-    document.getElementById('scoreDisplay').textContent = `คะแนนรวมจริง: ${totalScore.toFixed(2)} / 120`;
+   // document.getElementById('scoreDisplay').textContent = `คะแนนรวมจริง: ${totalScore.toFixed(2)} / 120`;
 
     if (completed.length === 6) {
       setTimeout(() => {

@@ -41,7 +41,6 @@
       cursor: pointer;
       transition: transform 0.2s ease-in-out;
     }
-
     .img-button:hover {
       transform: scale(1.05);
     }
@@ -52,15 +51,11 @@
       transition: opacity 0.3s ease;
       user-select: none;
     }
-
     .item { width: 200px; }
     .item2 { width: 100px; }
     .item3 { width: 70px; }
     .item4 { width: 130px; }
-
-    .selected {
-      opacity: 0.4;
-    }
+    .selected { opacity: 0.4; }
 
     #status {
       position: absolute;
@@ -75,7 +70,7 @@
 
     #selected-items {
       position: absolute;
-      bottom: 0;
+      bottom: 60px;
       left: 0;
       width: 100%;
       padding: 10px 0;
@@ -92,7 +87,7 @@
       background-repeat: no-repeat;
       background-position: center;
       width: 90%;
-      height: 270px;
+      height: 210px;
       padding: 20px;
       display: flex;
       align-items: center;
@@ -117,6 +112,27 @@
       border-radius: 6px;
     }
 
+    /* ปุ่มตกลงหลัก */
+    #main-confirm {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 30px;
+      font-size: 20px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      display: none;
+      z-index: 6;
+    }
+    #main-confirm:hover {
+      background: #45a049;
+    }
+
     /* Popup */
     #popup {
       position: fixed;
@@ -129,7 +145,6 @@
       padding: 10px;
       box-sizing: border-box;
     }
-
     .popup-content {
       position: relative;
       background: url('paper_popup.png') no-repeat center center;
@@ -144,7 +159,6 @@
       overflow-y: auto;
       border-radius: 12px;
     }
-
     .popup-content img#popup-img {
       width: 120px;
       height: auto;
@@ -152,35 +166,19 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
     }
-
-    /* แสงวาวแบบ animation */
     @keyframes shimmer {
-      0% {
-        filter: brightness(1) drop-shadow(0 0 2px #fff);
-      }
-      50% {
-        filter: brightness(1.5) drop-shadow(0 0 12px #fff);
-      }
-      100% {
-        filter: brightness(1) drop-shadow(0 0 2px #fff);
-      }
+      0% { filter: brightness(1) drop-shadow(0 0 2px #fff); }
+      50% { filter: brightness(1.5) drop-shadow(0 0 12px #fff); }
+      100% { filter: brightness(1) drop-shadow(0 0 2px #fff); }
     }
     .popup-content img#popup-img.shiny {
       animation: shimmer 1.5s ease-in-out infinite;
     }
-
     .popup-content p {
       font-size: 16px;
       margin-bottom: 20px;
       color: #333;
     }
-
-    .popup-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-
     .popup-buttons button {
       padding: 10px 20px;
       font-size: 16px;
@@ -189,36 +187,15 @@
       cursor: pointer;
       font-weight: bold;
       font-family: 'Kanit', sans-serif;
-      transition: background-color 0.3s ease;
     }
-
     .popup-buttons button:first-child {
       background: #4caf50;
       color: white;
     }
-
-    .popup-buttons button:first-child:hover {
-      background: #45a049;
-    }
-
-    .popup-buttons button:nth-child(2) {
-      background: #2196F3;
-      color: white;
-    }
-
-    .popup-buttons button:nth-child(2):hover {
-      background: #1976d2;
-    }
-
     .popup-buttons button:last-child {
       background: #f44336;
       color: white;
     }
-
-    .popup-buttons button:last-child:hover {
-      background: #da190b;
-    }
-
     .close-btn {
       position: absolute;
       top: 8px;
@@ -233,7 +210,6 @@
 <body>
 
 <div id="game-container">
-  <!-- ปุ่มคำใบ้ / กติกา / รีเซ็ต -->
   <div id="floating-buttons">
     <img src="btn_hint.png" class="img-button" alt="คำใบ้" onclick="showPopup('hint')">
     <img src="btn_rule.png" class="img-button" alt="กติกา" onclick="showPopup('rule')">
@@ -242,22 +218,20 @@
 
   <!-- ไอเทมซ่อน -->
   <img src="item1.png" id="item1" class="item" style="top: 900px; left: 400px;" onclick="handleItemClick(this)">
-  <img src="item2.png" id="item2" class="item2" style="top: 500px; left: 240px;" onclick="handleItemClick(this)">
+  <img src="item2.png" id="item2" class="item2" style="top: 300px; left: 160px;" onclick="handleItemClick(this)">
   <img src="item3.png" id="item3" class="item3" style="top: 650px; left: 400px;" onclick="handleItemClick(this)">
   <img src="item4.png" id="item4" class="item4" style="top: 500px; left: 570px;" onclick="handleItemClick(this)">
   <img src="item5.png" id="item5" class="item3" style="top: 378px; left: 380px;" onclick="handleItemClick(this)">
   <img src="item6.png" id="item6" class="item" style="top: 258px; left: 450px;" onclick="handleItemClick(this)">
-  <img src="item7.png" id="item7" class="item" style="top: 300px; left: 120px;" onclick="handleItemClick(this)">
+  <img src="item7.png" id="item7" class="item" style="top: 500px; left: 50px;" onclick="handleItemClick(this)">
 
-  <!-- คะแนน -->
-  <div id="status">คะแนน: 0 / 20</div>
-
-  <!-- แถบรายการที่เลือก -->
+  
   <div id="selected-items">
     <div class="paper-frame">
       <div id="item-list"></div>
     </div>
   </div>
+  <button id="main-confirm" onclick="confirmSelection()">ตกลง</button>
 </div>
 
 <!-- Popup -->
@@ -268,62 +242,45 @@
     <p id="popup-desc">ข้อมูลของไอเทม</p>
     <div class="popup-buttons">
       <button id="select-btn">เลือก</button>
-      <button id="confirm-btn">ตกลง</button>
       <button onclick="closePopup()">ปิด</button>
     </div>
   </div>
 </div>
 
 <script>
-  const correctItems = new Set(['item1', 'item3', 'item4', 'item5', 'item6']);
-  const scorePerItem = 4;
+  const correctItems = new Set(['item1', 'item3', 'item5', 'item6']);
+  const scorePerItem = 5;
   let selectedItems = new Set();
   let currentItemId = null;
-  let confirmed = false; // สถานะกดตกลงล็อคคะแนนแล้ว
 
   const itemDescriptions = {
     item1: "เครื่องรางพญานาคจากลุ่มน้ำโขง เชื่อว่าให้โชคด้านการสอบและค้าขาย",
-    item2: "แจกันโบราณที่วางในห้องมานานเกือบร้อยปี",
+    item2: "นาฬิกาโบราณ",
     item3: "ขวดน้ำมนต์ที่ใช้ในพิธีกรรมโบราณ",
-    item4: "รูปปั้นพญานาคทองคำ",
-    item5: "ตะกรุดเก่าแก่ที่แขวนอยู่ใกล้บันได",
-    item6: "หนังสือบุญผเวด ฉบับพิมพ์โบราณ",
-    item7: "ขวดน้ำมนต์ที่ใช้ในงานบุญผเวด"
+    item4: "ดินปั้นด่านเกวียน",
+    item5: "ตะเกียงโบราณ",
+    item6: "ชิ้นส่วนปราสาทหินพิมาย",
+    item7: "ไม้เท้าแระจำตัว"
   };
 
-  const popupImg = document.getElementById("popup-img");
-  const popupDesc = document.getElementById("popup-desc");
-  const selectBtn = document.getElementById("select-btn");
-  const confirmBtn = document.getElementById("confirm-btn");
-
   function handleItemClick(element) {
-    if (confirmed) return; // ถ้าล็อคแล้วห้ามเลือกเปลี่ยน
-
     currentItemId = element.id;
+    document.getElementById("popup-desc").textContent = itemDescriptions[currentItemId] || "ไม่มีข้อมูลของไอเทมนี้";
+    document.getElementById("popup-img").src = element.src;
+    document.getElementById("popup-img").classList.add("shiny");
 
-    popupDesc.textContent = itemDescriptions[currentItemId] || "ไม่มีข้อมูลของไอเทมนี้";
-
-    popupImg.src = element.src;
-    popupImg.classList.add("shiny");
-    popupImg.style.display = "block";
-
-    selectBtn.style.display = "inline-block";
-    confirmBtn.style.display = "inline-block";
-
+    const selectBtn = document.getElementById("select-btn");
     selectBtn.textContent = selectedItems.has(currentItemId) ? "ยกเลิกเลือก" : "เลือก";
-
     selectBtn.onclick = () => {
-      if (confirmed) return;
       toggleSelect(document.getElementById(currentItemId));
       selectBtn.textContent = selectedItems.has(currentItemId) ? "ยกเลิกเลือก" : "เลือก";
     };
 
-    popup.style.display = "flex";
+    document.getElementById("popup").style.display = "flex";
   }
 
   function toggleSelect(element) {
     const id = element.id;
-
     if (selectedItems.has(id)) {
       selectedItems.delete(id);
       element.classList.remove('selected');
@@ -331,22 +288,17 @@
       selectedItems.add(id);
       element.classList.add('selected');
     }
-
     updateScoreAndList();
   }
 
   function updateScoreAndList() {
     let score = 0;
     selectedItems.forEach(id => {
-      if (correctItems.has(id)) {
-        score += scorePerItem;
-      }
+      if (correctItems.has(id)) score += scorePerItem;
     });
-
     if (score > 20) score = 20;
 
-    document.getElementById('status').textContent = `คะแนน: ${score} / 20`;
-
+    //document.getElementById('status').textContent = `คะแนน: ${score} / 20`;
     const itemList = document.getElementById('item-list');
     itemList.innerHTML = '';
     selectedItems.forEach(id => {
@@ -358,41 +310,28 @@
         itemList.appendChild(thumb);
       }
     });
+
+    document.getElementById("main-confirm").style.display = selectedItems.size > 0 ? "block" : "none";
   }
 
   function showPopup(type) {
-    if (confirmed) return; // ถ้าล็อคคะแนนแล้วไม่แสดงกติกาหรือคำใบ้อีก
+    document.getElementById("popup-img").classList.remove("shiny");
+    document.getElementById("select-btn").style.display = "none";
 
     if (type === "hint") {
-      popupDesc.textContent = "ลองมองหาสิ่งของที่วางอยู่ริมหน้าต่าง ใต้โต๊ะ หรือในมุมที่มืด";
-      popupImg.style.display = "none";
-      selectBtn.style.display = "none";
-      confirmBtn.style.display = "none";
+      document.getElementById("popup-desc").textContent = "ลองมองหาสิ่งของที่วางอยู่ริมหน้าต่าง ใต้โต๊ะ หรือในมุมที่มืด";
     } else if (type === "rule") {
-      popupDesc.innerHTML = `<img src="rule_image.png" style="width:100%">`;
-      popupImg.style.display = "none";
-      selectBtn.style.display = "none";
-      confirmBtn.style.display = "none";
+      document.getElementById("popup-desc").innerHTML = `<img src="rule_image.png" style="width:100%">`;
     }
 
-    popup.style.display = "flex";
+    document.getElementById("popup").style.display = "flex";
   }
 
   function closePopup() {
-    popup.style.display = "none";
-    popupImg.classList.remove("shiny");
-    popupImg.style.display = "block";
-    selectBtn.style.display = "inline-block";
-    selectBtn.textContent = "เลือก";
-    confirmBtn.style.display = "inline-block";
+    document.getElementById("popup").style.display = "none";
   }
 
   function resetGame() {
-    if (confirmed) {
-      alert("คุณได้กดตกลงแล้ว ไม่สามารถรีเซ็ตได้");
-      return;
-    }
-
     selectedItems.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.classList.remove('selected');
@@ -401,23 +340,32 @@
     updateScoreAndList();
   }
 
-  function confirmSelection() {
-    if (selectedItems.size === 0) {
-      alert("กรุณาเลือกอย่างน้อย 1 ไอเทมก่อนกดตกลง");
-      return;
-    }
-    confirmed = true;
-
-    closePopup();
-
-    selectBtn.style.display = "none";
-    confirmBtn.style.display = "none";
-
-    alert("บันทึกคะแนนเรียบร้อยแล้ว");
+ function confirmSelection() {
+  if (selectedItems.size === 0) {
+    alert("กรุณาเลือกอย่างน้อย 1 ไอเทมก่อนกดตกลง");
+    return;
   }
 
-  // อ้างอิง element popup ไว้ใช้ในฟังก์ชัน
-  const popup = document.getElementById("popup");
+  // คำนวณคะแนน
+  let score = 0;
+  selectedItems.forEach(id => {
+    if (correctItems.has(id)) {
+      score += scorePerItem;
+    }
+  });
+  if (score > 20) score = 20;
+
+  // บันทึกคะแนนลง localStorage
+  localStorage.setItem('score_stage3', score);
+
+  confirmed = true;
+  closePopup();
+  alert("บันทึกคะแนนเรียบร้อยแล้ว");
+
+  // กลับไปหน้า index.html
+  window.location.href = "index.html";
+}
+
 </script>
 
 </body>
